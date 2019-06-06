@@ -119,17 +119,18 @@ namespace Jing
         /// <summary>
         /// 状态机名称
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public FiniteStateMachine(string name = null)
         {
-            this.Name = name;
+            Name = name;
         }
 
         /// <summary>
         /// 注册一个状态，不适用的方法可以传递Null
         /// </summary>
-        public void RegistState(T state, Action<T, object> onEnter = null, Action<T> onExit = null, Action<T> onUpdate = null, Func<T, bool> checkSwitchEnable = null)
+        public void RegistState(T state, Action<T, object> onEnter = null, Action<T> onExit = null,
+            Action<T> onUpdate = null, Func<T, bool> checkSwitchEnable = null)
         {
             StateController<T> sc = new StateController<T>(state);
             sc.onEnter = onEnter;
@@ -158,7 +159,7 @@ namespace Jing
 
             if (CurState.Equals(state))
             {
-                CurState = default(T);
+                CurState = default;
             }
         }
 
@@ -173,8 +174,7 @@ namespace Jing
             {
                 return;
             }
-
-
+            
             if (null == _stateDic[fromState].roleSwitch)
             {
                 _stateDic[fromState].roleSwitch = new HashSet<T>();
@@ -221,16 +221,12 @@ namespace Jing
                 return false;
             }
 
-            if (null != oldSC.onExit)
-            {
-                oldSC.onExit.Invoke(toState);
-            }
+            oldSC.onExit?.Invoke(toState);
+
             CurState = toState;
             StateStayTime = 0;
-            if (null != newSC.onEnter)
-            {
-                newSC.onEnter.Invoke(oldSC.state, data);
-            }
+            newSC.onEnter?.Invoke(oldSC.state, data);
+
             return true;
         }
 
@@ -242,10 +238,7 @@ namespace Jing
         {
             StateStayTime += dt;
             var nowSC = _stateDic[CurState];
-            if (null != nowSC.onUpdate)
-            {
-                nowSC.onUpdate.Invoke(CurState);
-            }
+            nowSC.onUpdate?.Invoke(CurState);
         }
     }
 }

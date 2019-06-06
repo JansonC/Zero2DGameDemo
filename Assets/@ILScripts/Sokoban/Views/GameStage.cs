@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using IL.Zero;
 using Sokoban;
 using UnityEngine;
@@ -15,6 +14,7 @@ namespace IL
         List<BaseUnit> _unitList;
         RoleUnit _roleUnit;
         EDir _lastMove;
+
         /// <summary>
         /// 操作记录
         /// </summary>
@@ -24,7 +24,7 @@ namespace IL
         {
             _contents = GetChild("Contents");
             _camera = GetChildComponent<Camera>("Camera");
-            
+
             float off = Define.MAP_TILE_COUNT_OF_SIDE * Define.TILE_SIZE / -2f;
             _contents.localPosition = new Vector2(off, off);
 
@@ -40,7 +40,7 @@ namespace IL
         }
 
         protected override void OnEnable()
-        {            
+        {
             ILBridge.Ins.onUpdate += OnUpdate;
             _roleUnit.onMoveEnd += OnRoleMoveEnd;
             GameEvent.Ins.onScreenSizeChange += AdjustmentCamera;
@@ -59,15 +59,14 @@ namespace IL
         private void AdjustmentCamera()
         {
             //如果不是竖屏则不用处理
-            if(Screen.height <= Screen.width)
+            if (Screen.height <= Screen.width)
             {
                 _camera.orthographicSize = 4.4f;
                 return;
             }
 
-            float size = (float)Screen.height / Screen.width * 4.4f;
+            float size = (float) Screen.height / Screen.width * 4.4f;
             _camera.orthographicSize = size;
-
         }
 
         private void OnRoleMoveEnd(MoveableUnit obj)
@@ -86,8 +85,9 @@ namespace IL
             var st = new SortTool<BaseUnit>();
             foreach (var ub in _unitList)
             {
-                st.AddItem((int)(ub.SortValue * 100), ub);
+                st.AddItem((int) (ub.SortValue * 100), ub);
             }
+
             var sortList = st.Sort(true);
             for (int i = 0; i < sortList.Length; i++)
             {
@@ -101,7 +101,7 @@ namespace IL
             foreach (var vo in _lv.targets)
             {
                 var unit = ViewFactory.Create<BaseUnit>(prefab, _contents, EUnitType.TARGET);
-                unit.SetTile(vo.x, vo.y);                
+                unit.SetTile(vo.x, vo.y);
             }
         }
 
@@ -148,7 +148,7 @@ namespace IL
                 return false;
             }
 
-            if(_roleUnit.IsMoving)
+            if (_roleUnit.IsMoving)
             {
                 return false;
             }
@@ -157,18 +157,18 @@ namespace IL
 
             //检查目标位置是否有阻挡
             var block = GetUnitInTile(endTile);
-            if(null != block)
+            if (null != block)
             {
-                if(EUnitType.BLOCK == block.UnitType)
+                if (EUnitType.BLOCK == block.UnitType)
                 {
                     return false;
                 }
 
-                if(EUnitType.BOX == block.UnitType)
+                if (EUnitType.BOX == block.UnitType)
                 {
                     //推动箱子
                     var moveBoxSuccess = MoveBox(block as BoxUnit, dir);
-                    if(false == moveBoxSuccess)
+                    if (false == moveBoxSuccess)
                     {
                         //箱子推动失败
                         return false;
@@ -181,7 +181,7 @@ namespace IL
 
         bool MoveBox(BoxUnit box, EDir dir)
         {
-            if(null == box)
+            if (null == box)
             {
                 return false;
             }
@@ -203,16 +203,16 @@ namespace IL
         {
             unit.onMoveEnd -= OnBoxMoveEnd;
 
-            if(_lv.IsTarget((ushort)unit.Tile.x, (ushort)unit.Tile.y))
+            if (_lv.IsTarget((ushort) unit.Tile.x, (ushort) unit.Tile.y))
             {
-                (unit as BoxUnit).SetIsAtTarget(true);
+                (unit as BoxUnit)?.SetIsAtTarget(true);
                 //播放一个效果
                 ViewFactory.Create<BangEffect>("hot_res/prefabs/game", "BangEffect", unit.gameObject.transform);
                 CheckLevelComplete();
             }
             else
             {
-                (unit as BoxUnit).SetIsAtTarget(false);
+                (unit as BoxUnit)?.SetIsAtTarget(false);
             }
         }
 
@@ -222,17 +222,18 @@ namespace IL
             {
                 if (unit.UnitType == EUnitType.BOX)
                 {
-                    if (false == _lv.IsTarget((ushort)unit.Tile.x, (ushort)unit.Tile.y))
+                    if (false == _lv.IsTarget((ushort) unit.Tile.x, (ushort) unit.Tile.y))
                     {
                         return;
                     }
                 }
             }
 
-            MsgWin.Show("Congratulations!", false, () => {
+            MsgWin.Show("Congratulations!", false, () =>
+            {
                 //通知关卡完成
                 GameEvent.Ins.onLevelComplete?.Invoke();
-            }).SetLabel("Next");            
+            }).SetLabel("Next");
         }
 
         /// <summary>
@@ -242,13 +243,14 @@ namespace IL
         /// <returns></returns>
         BaseUnit GetUnitInTile(Vector2Int tile)
         {
-            foreach(var unit in _unitList)
+            foreach (var unit in _unitList)
             {
-                if(unit.Tile == tile)
+                if (unit.Tile == tile)
                 {
                     return unit;
                 }
             }
+
             return null;
         }
 
@@ -270,6 +272,7 @@ namespace IL
                     endTile = startTile + Vector2Int.right;
                     break;
             }
+
             return endTile;
         }
 
@@ -278,20 +281,11 @@ namespace IL
             if (_recordStack.Count > 0)
             {
                 var vo = _recordStack.Pop();
-                _roleUnit.SetTile((ushort)vo.roleTile.x, (ushort)vo.roleTile.y);
+                _roleUnit.SetTile((ushort) vo.roleTile.x, (ushort) vo.roleTile.y);
                 _roleUnit.SetToward(vo.dir);
                 var box = _unitList[vo.boxIdx];
-                box.SetTile((ushort)vo.boxTile.x, (ushort)vo.boxTile.y);
-
-
-                if (_lv.IsTarget((ushort)box.Tile.x, (ushort)box.Tile.y))
-                {
-                    (box as BoxUnit).SetIsAtTarget(true);
-                }
-                else
-                {
-                    (box as BoxUnit).SetIsAtTarget(false);
-                }
+                box.SetTile((ushort) vo.boxTile.x, (ushort) vo.boxTile.y);
+                (box as BoxUnit)?.SetIsAtTarget(_lv.IsTarget((ushort) box.Tile.x, (ushort) box.Tile.y));
             }
         }
     }

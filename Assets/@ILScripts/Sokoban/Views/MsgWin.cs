@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace IL
 {
-    class MsgWin:AWinView
+    class MsgWin : AWinView
     {
         public static MsgWin Show(string content, bool isConfirm = false, Action onOK = null, Action onCancel = null)
         {
@@ -17,7 +17,7 @@ namespace IL
 
         Button _btnOK;
         Button _btnCancel;
-        Text _text;        
+        Text _text;
 
         protected override void OnInit()
         {
@@ -51,13 +51,13 @@ namespace IL
         private void OK()
         {
             _onOK?.Invoke();
-            Close();            
+            Close();
         }
 
         private void Cancel()
         {
             _onCancel?.Invoke();
-            Close();            
+            Close();
         }
 
         void Close()

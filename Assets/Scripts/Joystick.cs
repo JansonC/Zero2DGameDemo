@@ -7,21 +7,15 @@ namespace GameKit
 {
     public class Joystick : MonoBehaviour
     {
-
-        [Header("摇杆最大半径(UGUI)")]
-        public float maxRadius = 0;
-        [Header("摇杆最小半径(UGUI)")]
-        public float minRadius = 0;
-        [Header("摇杆框")]
-        public Transform stickBorder;
-        [Header("摇杆")]
-        public Transform stick;
+        [Header("摇杆最大半径(UGUI)")] public float maxRadius = 0;
+        [Header("摇杆最小半径(UGUI)")] public float minRadius = 0;
+        [Header("摇杆框")] public Transform stickBorder;
+        [Header("摇杆")] public Transform stick;
 
         /// <summary>
         /// 绑定的相机
         /// </summary>
-        [HideInInspector]
-        public Camera camera;
+        [HideInInspector] public Camera camera;
 
         /// <summary>
         /// 触摸的起始位置
@@ -44,18 +38,9 @@ namespace GameKit
 
         bool _isStickMode = false;
 
-        private void Awake()
-        {
-            
-        }
-
         void Start()
         {
             _stickBorderInitPos = stickBorder.position;
-        }
-
-        private void OnGUI()
-        {
         }
 
         private void FixedUpdate()
@@ -66,11 +51,19 @@ namespace GameKit
                 CheckKeyPress(KeyCode.DownArrow);
                 CheckKeyPress(KeyCode.LeftArrow);
                 CheckKeyPress(KeyCode.RightArrow);
+                CheckKeyPress(KeyCode.W);
+                CheckKeyPress(KeyCode.S);
+                CheckKeyPress(KeyCode.A);
+                CheckKeyPress(KeyCode.D);
 
                 CheckKeyRelease(KeyCode.UpArrow);
                 CheckKeyRelease(KeyCode.DownArrow);
                 CheckKeyRelease(KeyCode.LeftArrow);
                 CheckKeyRelease(KeyCode.RightArrow);
+                CheckKeyRelease(KeyCode.W);
+                CheckKeyRelease(KeyCode.S);
+                CheckKeyRelease(KeyCode.A);
+                CheckKeyRelease(KeyCode.D);
 
                 Vector2 tempValue = Vector2.zero;
                 if (_pressedKeyCode.Count > 0)
@@ -78,15 +71,19 @@ namespace GameKit
                     switch (_pressedKeyCode[0])
                     {
                         case KeyCode.UpArrow:
+                        case KeyCode.W:
                             tempValue = Vector2.up;
                             break;
                         case KeyCode.DownArrow:
+                        case KeyCode.S:
                             tempValue = Vector2.down;
                             break;
                         case KeyCode.LeftArrow:
+                        case KeyCode.A:
                             tempValue = Vector2.left;
                             break;
                         case KeyCode.RightArrow:
+                        case KeyCode.D:
                             tempValue = Vector2.right;
                             break;
                     }
@@ -115,7 +112,7 @@ namespace GameKit
         }
 
         void CheckKeyRelease(KeyCode keyCode)
-        {            
+        {
             if (false == Input.GetKey(keyCode))
             {
                 _pressedKeyCode.Remove(keyCode);
@@ -129,15 +126,15 @@ namespace GameKit
         /// <returns></returns>
         Vector2 GetLocalMousePosition(GameObject go)
         {
-            if(null == camera)
+            if (null == camera)
             {
                 throw new Exception("Joystick need binding a camera");
             }
 
             Vector2 screenMouse = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             Vector2 localPoint;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(go.GetComponent<RectTransform>(), screenMouse, camera, out localPoint);
-
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(go.GetComponent<RectTransform>(), screenMouse,
+                camera, out localPoint);
             //Debug.LogFormat("Mouse:{0}  Screen:{1}  LocalPoint:{2}", Input.mousePosition, screenMouse, localPoint);
             return localPoint;
         }
@@ -149,7 +146,6 @@ namespace GameKit
         public void OnPointerDown(BaseEventData e)
         {
             stickBorder.localPosition = GetLocalMousePosition(gameObject);
-
             stickBorder.GetComponent<CanvasGroup>().alpha = 0.4f;
         }
 
@@ -160,7 +156,6 @@ namespace GameKit
         public void OnBeginDrag(BaseEventData e)
         {
             _isStickMode = true;
-
             _touchStartPos = GetLocalMousePosition(stickBorder.gameObject);
         }
 
@@ -171,8 +166,7 @@ namespace GameKit
         public void OnDrag(BaseEventData e)
         {
             Vector2 touchNowPos = GetLocalMousePosition(stickBorder.gameObject);
-
-            var moveVector = (touchNowPos - _touchStartPos);
+            var moveVector = touchNowPos - _touchStartPos;
             //Debug.LogFormat("start:{0}   mouse:{1}    moved:{2}", _touchStartPos, Input.mousePosition, moveVector);
             if (moveVector.magnitude > maxRadius)
             {
@@ -180,7 +174,6 @@ namespace GameKit
                 moveVector /= k;
             }
             stick.localPosition = moveVector;
-
             Vector2 value = Vector2.zero;
             if (moveVector.magnitude >= minRadius)
             {
@@ -199,7 +192,6 @@ namespace GameKit
             stick.localPosition = Vector3.zero;
             onValueChange?.Invoke(Vector2.zero);
             _isStickMode = false;
-
             ResetStickBorder();
         }
 

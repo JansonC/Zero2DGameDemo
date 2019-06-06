@@ -6,7 +6,7 @@ using Zero;
 namespace IL
 {
     class MoveableUnit : BaseUnit
-    {       
+    {
         enum EState
         {
             IDLE,
@@ -15,9 +15,10 @@ namespace IL
 
         FiniteStateMachine<EState> _fsm = new FiniteStateMachine<EState>();
         public Vector2Int TileLastAt { get; private set; }
-        public Vector2Int TileMoveTo { get; private set; }        
+        public Vector2Int TileMoveTo { get; private set; }
         public bool IsMoving { get; private set; }
         public EDir MoveDir { get; private set; }
+
         /// <summary>
         /// 移动速度
         /// </summary>
@@ -27,7 +28,7 @@ namespace IL
 
         public event Action<MoveableUnit> onMoveEnd;
         public event Action<MoveableUnit> onMoveStart;
-        
+
 
         protected override void OnInit()
         {
@@ -42,7 +43,7 @@ namespace IL
             switch (_fsm.CurState)
             {
                 case EState.IDLE:
-                    IsMoving = false;                    
+                    IsMoving = false;
                     break;
                 case EState.MOVE:
                     IsMoving = true;
@@ -53,10 +54,11 @@ namespace IL
 
         private void OnUpdateMoveState(EState nowState)
         {
-            gameObject.transform.localPosition = Vector3.MoveTowards(gameObject.transform.localPosition, _targetLocalPosition, Time.deltaTime * moveSpeed);
+            gameObject.transform.localPosition = Vector3.MoveTowards(gameObject.transform.localPosition,
+                _targetLocalPosition, Time.deltaTime * moveSpeed);
             if (_targetLocalPosition == gameObject.transform.localPosition)
             {
-                Tile = TileMoveTo;             
+                Tile = TileMoveTo;
                 _fsm.SwitchState(EState.IDLE);
                 onMoveEnd?.Invoke(this);
             }
@@ -95,6 +97,6 @@ namespace IL
             _targetLocalPosition = TileUtil.Tile2Position(TileMoveTo);
             _fsm.SwitchState(EState.MOVE);
             return true;
-        } 
+        }
     }
 }

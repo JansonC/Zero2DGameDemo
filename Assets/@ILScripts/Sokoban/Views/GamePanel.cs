@@ -3,7 +3,6 @@ using IL.Zero;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using Zero;
 
 namespace IL
 {
@@ -23,21 +22,11 @@ namespace IL
             _js.camera = GameObject.Find("UICamera").GetComponent<Camera>();
         }
 
-        protected override void OnDestroy()
-        {
-            
-        }
-
         protected override void OnEnable()
         {
             _btnBack.onClick.AddListener(OnClickBack);
             _btnReback.onClick.AddListener(OnClickReback);
             _js.onValueChange += OnValueChange;
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
         }
 
         private void OnValueChange(Vector2 value)
@@ -53,26 +42,12 @@ namespace IL
                 if (Math.Abs(value.x) > Math.Abs(value.y))
                 {
                     //横向移动
-                    if (value.x < 0)
-                    {
-                        newDir = EDir.LEFT;
-                    }
-                    else
-                    {
-                        newDir = EDir.RIGHT;
-                    }
+                    newDir = value.x < 0 ? EDir.LEFT : EDir.RIGHT;
                 }
                 else
                 {
                     //纵向移动
-                    if (value.y < 0)
-                    {
-                        newDir = EDir.DOWN;
-                    }
-                    else
-                    {
-                        newDir = EDir.UP;
-                    }
+                    newDir = value.y < 0 ? EDir.DOWN : EDir.UP;
                 }
             }
 
@@ -87,9 +62,7 @@ namespace IL
 
         private void OnClickBack()
         {
-            MsgWin.Show("Exit？", true, () => {
-                Global.Ins.menu.ShowMenu(true);                
-            });
+            MsgWin.Show("Exit？", true, () => { Global.Ins.menu.ShowMenu(true); });
         }
     }
 }

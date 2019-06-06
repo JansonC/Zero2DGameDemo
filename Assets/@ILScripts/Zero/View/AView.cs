@@ -18,24 +18,21 @@ namespace IL.Zero
         /// <summary>
         /// Unity中的GameObject对象
         /// </summary>
-        public GameObject gameObject { get; private set; }        
+        public GameObject gameObject { get; private set; }
 
         /// <summary>
         /// 是否销毁了
         /// </summary>
-        public bool IsDestroyed
-        {
-            get { return gameObject == null ? true : false; }
-        }        
+        public bool IsDestroyed => gameObject == null;
 
         /// <summary>
         /// 对象名称
         /// </summary>
         public string Name
         {
-            get { return gameObject.name; }
-            set { gameObject.name = value; }
-        }                      
+            get => gameObject.name;
+            set => gameObject.name = value;
+        }
 
         /// <summary>
         /// 挂载到GameObject上的脚本
@@ -53,7 +50,7 @@ namespace IL.Zero
 
             OnInit();
 
-            if(data != null)
+            if (data != null)
             {
                 SetData(data);
             }
@@ -70,6 +67,7 @@ namespace IL.Zero
             {
                 return;
             }
+
             OnData(data);
         }
 
@@ -88,10 +86,7 @@ namespace IL.Zero
             _z = null;
             gameObject = null;
             OnDestroy();
-            if(null != onDestroyHandler)
-            {
-                onDestroyHandler.Invoke(this);
-            }            
+            onDestroyHandler?.Invoke(this);
         }
 
         /// <summary>
@@ -100,9 +95,9 @@ namespace IL.Zero
         /// <param name="isActive"></param>
         public void SetActive(bool isActive)
         {
-            if(isActive)
+            if (isActive)
             {
-                if(false == gameObject.activeInHierarchy)
+                if (false == gameObject.activeInHierarchy)
                 {
                     gameObject.SetActive(true);
                     //WhenEnable();
@@ -110,10 +105,10 @@ namespace IL.Zero
             }
             else
             {
-                if(gameObject.activeInHierarchy)
+                if (gameObject.activeInHierarchy)
                 {
                     //WhenDisable();
-                    gameObject.SetActive(false);                    
+                    gameObject.SetActive(false);
                 }
             }
         }
@@ -133,7 +128,7 @@ namespace IL.Zero
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T AudoGetComponent<T>() where T :Component
+        public T AudoGetComponent<T>() where T : Component
         {
             return ComponentUtil.AutoGet<T>(gameObject);
         }
@@ -151,6 +146,7 @@ namespace IL.Zero
             {
                 return null;
             }
+
             return child.GetComponent<T>();
         }
 
@@ -167,6 +163,7 @@ namespace IL.Zero
             {
                 return null;
             }
+
             return child.GetComponent<T>();
         }
 
@@ -178,7 +175,7 @@ namespace IL.Zero
         public Transform GetChild(string childName)
         {
             return gameObject.transform.Find(childName);
-        }    
+        }
 
         /// <summary>
         /// 得到子对象
@@ -189,7 +186,7 @@ namespace IL.Zero
         {
             return gameObject.transform.GetChild(index);
         }
-        
+
         /// <summary>
         /// 得到子对象
         /// </summary>
@@ -198,10 +195,11 @@ namespace IL.Zero
         public GameObject GetChildGameObject(string childName)
         {
             var child = GetChild(childName);
-            if(null != child)
+            if (null != child)
             {
                 return child.gameObject;
             }
+
             return null;
         }
 
@@ -217,6 +215,7 @@ namespace IL.Zero
             {
                 return child.gameObject;
             }
+
             return null;
         }
 
@@ -226,8 +225,8 @@ namespace IL.Zero
         /// <typeparam name="T"></typeparam>
         /// <param name="childName"></param>
         /// <returns></returns>
-        public T CreateViewChlid<T>(string childName, object data = null) where T:AView
-        {          
+        public T CreateViewChlid<T>(string childName, object data = null) where T : AView
+        {
             var childGameObject = GetChildGameObject(childName);
             return CreateViewChlid<T>(childGameObject, data);
         }
@@ -253,7 +252,7 @@ namespace IL.Zero
             }
 
             T viewChild = Activator.CreateInstance(typeof(T)) as T;
-            viewChild.SetGameObject(childGameObject, data);            
+            viewChild.SetGameObject(childGameObject, data);
             return viewChild;
         }
 
@@ -267,15 +266,16 @@ namespace IL.Zero
                 return;
             }
 
-            GameObject.Destroy(gameObject);
+            UnityEngine.Object.Destroy(gameObject);
         }
 
         public Coroutine StartCoroutine(IEnumerator routine)
         {
-            if(null == _z)
+            if (null == _z)
             {
                 return null;
             }
+
             return _z.StartCoroutine(routine);
         }
 
@@ -303,17 +303,14 @@ namespace IL.Zero
             }
         }
 
-
         #region 子类按需求重写实现的方法
+
         /// <summary>
         /// 初始化方法
         /// </summary>
         protected virtual void OnInit()
         {
-
         }
-        
-
 
         /// <summary>
         /// 当显示对象被实例化后该方法被调用。在该方法中可以预备视图所需要的数据。
@@ -322,7 +319,6 @@ namespace IL.Zero
         /// <param name="data"></param>
         protected virtual void OnData(object data)
         {
-
         }
 
         /// <summary>
@@ -330,7 +326,6 @@ namespace IL.Zero
         /// </summary>
         protected virtual void OnEnable()
         {
-
         }
 
         /// <summary>
@@ -338,7 +333,6 @@ namespace IL.Zero
         /// </summary>
         protected virtual void OnDisable()
         {
-
         }
 
         /// <summary>
@@ -346,8 +340,8 @@ namespace IL.Zero
         /// </summary>
         protected virtual void OnDestroy()
         {
-
         }
+
         #endregion
     }
 }

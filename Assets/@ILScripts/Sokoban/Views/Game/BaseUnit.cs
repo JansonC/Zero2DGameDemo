@@ -1,9 +1,4 @@
 ﻿using IL.Zero;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace IL
@@ -38,7 +33,7 @@ namespace IL
 
         protected override void OnData(object data)
         {
-            UnitType = (EUnitType)data;
+            UnitType = (EUnitType) data;
         }
 
         /// <summary>
@@ -56,13 +51,7 @@ namespace IL
         /// 得到排序值
         /// </summary>
         /// <returns></returns>
-        public float SortValue
-        {
-            get
-            {
-                return gameObject.transform.localPosition.y;
-            }
-        }
+        public float SortValue => gameObject.transform.localPosition.y;
 
         /// <summary>
         /// 设置排序值
@@ -74,7 +63,8 @@ namespace IL
             {
                 Debug.Log(Name);
             }
-            _sr.sortingOrder = v;            
+
+            _sr.sortingOrder = v;
         }
     }
 }
